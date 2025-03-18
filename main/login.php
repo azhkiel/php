@@ -1,27 +1,50 @@
 <?php 
-    include "../service/database.php";
-    session_start();
-    $login_mesegge = "";
-    if (isset($_SESSION["is_login"])){
-        header("Location: dashboard.php");
-    }
+    // Menghubungkan ke file database.php untuk menyambungkan ke basis data
+include "../service/database.php";
 
-    if (isset($_POST['login'])){
-        $username = $_POST['username'];
-        $password = $_POST['password'];
-        $hash_password = hash("sha256",$password);
-        $sql = "SELECT * FROM akunphp WHERE username = '$username' AND password = '$hash_password'";
-        $result = $db->query($sql);
-        if ($result->num_rows > 0) {
-            $data = $result->fetch_assoc();
-            $_SESSION["username"] = $data["username"];
-            $_SESSION["is_login"] = true; 
-            echo $data['username'];
-            header("Location: dashboard.php");
-        } else {
-            $login_mesegge = "nama atau password salah!";
-        }
+// Memulai sesi PHP
+session_start();
+
+// Inisialisasi variabel untuk menyimpan pesan login
+$login_mesegge = "";
+
+// Memeriksa apakah pengguna sudah login. Jika iya, langsung dialihkan ke dashboard.php
+if (isset($_SESSION["is_login"])){
+    header("Location: dashboard.php");
+}
+
+// Memeriksa apakah form login telah disubmit
+if (isset($_POST['login'])){
+    // Mengambil data username dan password dari form
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    // Mengenkripsi password menggunakan algoritma hash SHA-256
+    $hash_password = hash("sha256", $password);
+
+    // Query untuk mencari user dengan username dan password yang cocok di tabel 'akunphp'
+    $sql = "SELECT * FROM akunphp WHERE username = '$username' AND password = '$hash_password'";
+    $result = $db->query($sql); // Menjalankan query
+
+    // Memeriksa apakah ada hasil yang ditemukan
+    if ($result->num_rows > 0) {
+        // Mengambil data dari hasil query
+        $data = $result->fetch_assoc();
+
+        // Menyimpan username dan status login dalam sesi
+        $_SESSION["username"] = $data["username"];
+        $_SESSION["is_login"] = true;
+
+        // Menampilkan username (debugging purposes, lebih baik dihapus di produksi)
+        echo $data['username'];
+
+        // Mengarahkan pengguna ke dashboard.php
+        header("Location: dashboard.php");
+    } else {
+        // Menyimpan pesan error jika login gagal
+        $login_mesegge = "nama atau password salah!";
     }
+}
 
 ?>
 <!DOCTYPE html>
@@ -124,7 +147,7 @@ function showPopup(message) {
     document.getElementById('popup-message').textContent = message;
     document.getElementById('popup').classList.remove('hidden');
 }
-
+//hai
 // Function to hide the pop-up
 function hidePopup() {
     document.getElementById('popup').classList.add('hidden');

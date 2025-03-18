@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membuat Grafik Dengan Chart.js</title>
+    <script type="text/javascript" src="/Chart.js"></script>
+    <style>
+        body {
+            font-family: Roboto, sans-serif;
+            text-align: center;
+        }
+        .chart-container {
+            width: 500px;
+            height: 500px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <h2>Tutorial Membuat Grafik Dengan Chart.js</h2>
+    <div class="chart-container" style="width: 500px;height: 500px">
+        <canvas id="myChart"></canvas>
+    </div>
+    
+    <script>
+        var labels = ["ikan", "ayam", "bebek", "babi", "sapi", "telur","udang"];
+        var data = [17, 16, 15, 14, 13, 12, 11,10];
+    
+        // Cari nilai maksimum dan ambil labelnya
+        var maxValue = Math.max(...data);
+        var maxIndex = data.indexOf(maxValue);
+        var maxLabel = labels[maxIndex]; // Nama dataset dengan nilai terbanyak
+    
+        var ctx = document.getElementById("myChart").getContext("2d");
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: maxLabel, // Label otomatis dengan dataset terbanyak
+                    data: data,
+                    backgroundColor: [
+                        'rgba(255, 0, 0, 0.2)',   // Merah
+                        'rgba(255, 165, 0, 0.2)', // Oranye
+                        'rgba(255, 255, 0, 0.2)', // Kuning
+                        'rgba(0, 128, 0, 0.2)',   // Hijau
+                        'rgba(0, 0, 255, 0.2)',    // Biru
+                        'rgba(0, 0, 139, 0.2)',   //biru tua
+                        'rgba(75, 0, 130, 0.2)'   // Indigo
+                    ],
+                    borderColor: [
+                        'rgba(255, 0, 0, 1)',   
+                        'rgba(255, 165, 0, 1)', 
+                        'rgba(255, 255, 0, 1)', 
+                        'rgba(0, 128, 0, 1)',   
+                        'rgba(0, 0, 255, 1)',
+                        'rgba(0, 0, 139, 1)',
+                        'rgba(75, 0, 130, 1)'   
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+    
+    
+</body>
+</html>

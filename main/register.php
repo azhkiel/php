@@ -1,28 +1,43 @@
 <?php
-    include "../service/database.php";
-    session_start();
-    $register_messege = "";
-    if (isset($_SESSION["is_login"])){
-        header("Location: dashboard.php");
-    }
+    // Menghubungkan ke file database.php untuk menyambungkan ke database
+include "../service/database.php";
 
-    try{
-        if(isset($_POST['register'])){
-            $username = $_POST['username'];
-            $password = $_POST['password'];
-            $hash_password = hash("sha256",$password);
+// Memulai sesi PHP
+session_start();
 
-            $sql = "INSERT INTO `akunphp`(`username`, `password`) VALUES ('$username','$hash_password')";
-            if($db->query($sql)){
-                $register_messege = "Register success";
-            }else{
-                echo "Register failed";
+// Inisialisasi variabel untuk pesan registrasi
+$register_messege = "";
+
+// Memeriksa apakah pengguna sudah login. Jika iya, langsung dialihkan ke dashboard.php
+if (isset($_SESSION["is_login"])){
+    header("Location: dashboard.php");
+}
+
+// Blok try-catch untuk menangani kemungkinan kesalahan SQL
+try {
+    // Memeriksa apakah form register telah disubmit
+    if (isset($_POST['register'])) {
+        // Mengambil data username dan password dari form
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+
+        // Mengenkripsi password menggunakan algoritma hash SHA-256
+        $hash_password = hash("sha256", $password);
+
+        // Query untuk menyisipkan data user baru ke tabel 'akunphp'
+        $sql = "INSERT INTO `akunphp`(`username`, `password`) VALUES ('$username','$hash_password')";
+        
+        // Menjalankan query dan memeriksa keberhasilannya
+        if ($db->query($sql)) {
+            $register_messege = "Register success";
+        } else {
+            echo "Register failed";
         }
     }
-    }catch(mysqli_sql_exception){
-        $register_messege = "username already registered!";
-    }
-    
+} catch (mysqli_sql_exception) {
+    // Menangani kesalahan, seperti ketika username sudah terdaftar
+    $register_messege = "username already registered!";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
