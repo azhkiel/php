@@ -1,3 +1,17 @@
+<?php
+// Menghubungkan ke file database.php untuk menyambungkan ke basis data
+include "../service/database.php";
+
+// Memulai sesi PHP
+session_start();
+// Inisialisasi variabel untuk menyimpan pesan login
+$login_mesegge = "";
+
+// Memeriksa apakah pengguna sudah login. Jika iya, langsung dialihkan ke dashboard.php
+if (isset($_SESSION["is_login"])){
+    header("Location: dashboard.php");
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

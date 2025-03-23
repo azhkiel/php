@@ -23,7 +23,7 @@ if (isset($_POST['login'])){
     $hash_password = hash("sha256", $password);
 
     // Query untuk mencari user dengan username dan password yang cocok di tabel 'akunphp'
-    $sql = "SELECT * FROM akunphp WHERE username = '$username' AND password = '$hash_password'";
+    $sql = "SELECT * FROM users WHERE username = '$username' AND password = '$hash_password'";
     $result = $db->query($sql); // Menjalankan query
 
     // Memeriksa apakah ada hasil yang ditemukan

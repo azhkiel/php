@@ -15,19 +15,25 @@ if (isset($_POST['logout'])){
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Document</title>
 </head>
-<body>
+<body class="bg-gray-100">
     <?php include "../layout/header.html"?>
-    <section class="relative h-screen flex items-center justify-center">
+    <section class="relative min-h-screen flex flex-col items-center justify-center">
         <!-- Background Image -->
         <img src="../assets/background.jpg" class="w-full h-full object-cover absolute top-0 left-0 z-0">
 
         <!-- Dashboard Container -->
-        <div class="relative z-10 bg-white/70 p-8 rounded-lg shadow-lg text-center backdrop-blur-md">
-            <h1 class="text-3xl font-bold text-purple-600 mb-4">
-                SELAMAT DATANG, <?= $_SESSION["username"] ?>!
+        <div class="relative z-10 bg-white/80 p-8 rounded-lg shadow-lg backdrop-blur-md w-full max-w-screen-lg text-center">
+            <h1 class="text-3xl font-bold mb-4">
+                Selamat Datang, Tn. <?= $_SESSION["username"] ?>!
             </h1>
-            
-            <form method="post" action="dashboard.php">
+
+            <!-- Include Menu -->
+            <div class="mt-6 w-full">
+                <?php include 'menu.php'; ?>
+            </div>
+
+            <!-- Logout Button -->
+            <form method="post" action="dashboard.php" class="mt-6">
                 <button type="submit" name="logout" 
                     class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300">
                     Log Out

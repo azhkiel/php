@@ -19,13 +19,14 @@ try {
     if (isset($_POST['register'])) {
         // Mengambil data username dan password dari form
         $username = $_POST['username'];
+        $fullname = $_POST['fullname'];
         $password = $_POST['password'];
 
         // Mengenkripsi password menggunakan algoritma hash SHA-256
         $hash_password = hash("sha256", $password);
 
         // Query untuk menyisipkan data user baru ke tabel 'akunphp'
-        $sql = "INSERT INTO `akunphp`(`username`, `password`) VALUES ('$username','$hash_password')";
+        $sql = "INSERT INTO `users`(`username`,`fullname`, `password`) VALUES ('$username','$fullname','$hash_password')";
         
         // Menjalankan query dan memeriksa keberhasilannya
         if ($db->query($sql)) {
@@ -63,22 +64,38 @@ try {
         </div>
         <h1 class="text-2xl font-bold mb-4">Register</h1>
         
-        <form method="post" action="register.php" class="space-y-4">
+        <form method="post" action="register.php" class="space-y-4" onsubmit="return validatePassword()">
             <div>
-                <label for="name" class="block text-left font-semibold">Name:</label>
+                <label for="username" class="block text-left font-semibold">Username:</label>
                 <input type="text" placeholder="Username" name="username" class="w-full px-4 py-2 border rounded-md focus:border-blue-600 hover:border-blue-600 outline-none ">
+            </div>
+            <div>
+                <label for="fullname" class="block text-left font-semibold">Fullname:</label>
+                <input type="text" placeholder="fullname" name="fullname" class="w-full px-4 py-2 border rounded-md focus:border-blue-600 hover:border-blue-600 outline-none ">
             </div>
             <div>
                 <label for="password" class="block text-left font-semibold">Password:</label>
                 <div style="position: relative; display: flex; align-items: center;">
                     <input type="password" id="password" name="password" placeholder="Password" class="w-full px-4 py-2 border rounded-md focus:border-blue-600 hover:border-blue-600 outline-none">
-                    <span id="toggleIcon" onclick="togglePassword()" style="cursor: pointer; position: absolute; right: 10px;">
+                    <span id="toggleIcon" onclick="togglePassword('password')" style="cursor: pointer; position: absolute; right: 10px;">
                         <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.933 13.909A4.357 4.357 0 0 1 3 12c0-1 4-6 9-6m7.6 3.8A5.068 5.068 0 0 1 21 12c0 1-3 6-9 6-.314 0-.62-.014-.918-.04M5 19 19 5m-4 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                         </svg>
                     </span>
                 </div>
             </div>
+            <div>
+                <label for="confirm_password" class="block text-left font-semibold">Confirm Password:</label>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" class="w-full px-4 py-2 border rounded-md focus:border-blue-600 hover:border-blue-600 outline-none">
+                    <span id="toggleConfirmIcon" onclick="togglePassword('confirm_password')" style="cursor: pointer; position: absolute; right: 10px;">
+                        <svg class="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.933 13.909A4.357 4.357 0 0 1 3 12c0-1 4-6 9-6m7.6 3.8A5.068 5.068 0 0 1 21 12c0 1-3 6-9 6-.314 0-.62-.014-.918-.04M5 19 19 5m-4 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            
             <p class="text-gray-700 text-sm">
                 Sudah memiliki akun? 
                 <a href="login.php" class="text-blue-600 hover:underline">Klik disini</a>
@@ -124,6 +141,24 @@ try {
     });
     <?php endif; ?>
 </script>
+<script>
+        function togglePassword(inputId) {
+            var input = document.getElementById(inputId);
+            input.type = input.type === "password" ? "text" : "password";
+        }
+
+        function validatePassword() {
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("confirm_password").value;
+            
+            if (password !== confirmPassword) {
+                showPopup("password dan confirm password tidak sesuai!")
+                return false;
+            }
+            return true;
+        }
+    </script>
+
 
 <?php include "../layout/footer.html" ?>
 </body>
