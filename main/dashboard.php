@@ -16,7 +16,7 @@ if (isset($_POST['logout'])){
     <title>Document</title>
 </head>
 <body class="bg-gray-100">
-    <?php include "../layout/header.html"?>
+    <?php include "../layout/header.php"?>
     <section class="relative min-h-screen flex flex-col items-center justify-center">
         <!-- Background Image -->
         <img src="../assets/background.jpg" class="w-full h-full object-cover absolute top-0 left-0 z-0">
@@ -42,6 +42,6 @@ if (isset($_POST['logout'])){
         </div>
     </section>
 
-    <?php include "../layout/footer.html"?>
+    <?php include "../layout/footer.php"?>
 </body>
 </html>

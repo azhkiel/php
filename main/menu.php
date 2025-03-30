@@ -5,6 +5,7 @@ include '../service/database.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $kode_menu = $_POST['kode_menu'];
     $nama_menu = $_POST['nama_menu'];
+    $deskripsi_menu = $_POST['deskripsi_menu'];
     $kategori = $_POST['kategori'];
     $harga = $_POST['harga'];
     $gambar_lama = $_POST['gambar_lama']; // Untuk update gambar
@@ -21,9 +22,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Cek apakah ini edit atau tambah baru
     if (isset($_POST['edit_id']) && $_POST['edit_id'] != "") {
         $edit_id = $_POST['edit_id'];
-        $sql = "UPDATE menu SET kode_menu='$kode_menu', nama_menu='$nama_menu', kategori='$kategori', harga='$harga', gambar='$gambar_name' WHERE kode_menu='$edit_id'";
+        $sql = "UPDATE menu SET kode_menu='$kode_menu', nama_menu='$nama_menu', kategori='$kategori', harga='$harga', gambar='$gambar_name', deskripsi='$deskripsi_menu' WHERE kode_menu='$edit_id'";
     } else {
-        $sql = "INSERT INTO menu (kode_menu, nama_menu, kategori, harga, gambar) VALUES ('$kode_menu', '$nama_menu', '$kategori', '$harga', '$gambar_name')";
+        $sql = "INSERT INTO menu (kode_menu, nama_menu, kategori, harga, gambar, deskripsi) VALUES ('$kode_menu', '$nama_menu', '$kategori', '$harga', '$gambar_name','$deskripsi_menu')";
     }
 
     if ($db->query($sql)) {
@@ -59,12 +60,22 @@ if (isset($_GET['delete'])) {
         <li class="border rounded-lg p-4 shadow hover:shadow-lg transition">
             <img src="<?php echo $gambar_path; ?>" alt="<?php echo $row["nama_menu"]; ?>" class="w-full h-32 object-cover rounded mb-2">
             <h3 class="text-lg font-semibold"><?php echo $row["nama_menu"]; ?></h3>
+            <p class="text-sm"><?php echo $row["kode_menu"]; ?></p>
+            <p class="text-gray-500 text-sm"><?php echo $row["deskripsi"]; ?></p>
             <p class="text-gray-500 text-sm"><?php echo $row["kategori"]; ?></p>
             <p class="text-blue-600 font-bold">Rp <?php echo number_format($row["harga"], 0, ',', '.'); ?></p>
             <div class="mt-2">
-                <button onclick="editMenu('<?php echo $row['kode_menu']; ?>', '<?php echo $row['nama_menu']; ?>', '<?php echo $row['kategori']; ?>', '<?php echo $row['harga']; ?>', '<?php echo $row['gambar']; ?>')" class="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
-                <a href="menu.php?delete=<?php echo $row['kode_menu']; ?>" class="bg-red-500 text-white px-2 py-1 rounded">Hapus</a>
-            </div>
+    <button onclick="editMenu('<?php echo $row['kode_menu']; ?>', '<?php echo $row['nama_menu']; ?>', '<?php echo $row['kategori']; ?>', '<?php echo $row['harga']; ?>', '<?php echo $row['gambar']; ?>')" 
+        class="bg-yellow-500 text-white px-2 py-1 rounded">
+        Edit
+    </button>
+
+    <a href="menu.php?delete=<?php echo $row['kode_menu']; ?>" 
+        onclick="return confirmDelete('<?php echo $row['nama_menu']; ?>')"
+        class="bg-red-500 text-white px-2 py-1 rounded">
+        Hapus
+    </a>
+</div>
         </li>
         <?php } ?>
     </ul>
@@ -82,6 +93,9 @@ if (isset($_GET['delete'])) {
             
             <label class="block mb-2">Nama Menu:</label>
             <input type="text" name="nama_menu" id="nama_menu" class="w-full p-2 border rounded mb-2" required>
+            
+            <label class="block mb-2">Deskripsi Menu:</label>
+            <input type="text" name="deskripsi_menu" id="deskripsi_menu" class="w-full p-2 border rounded mb-2" required>
             
             <label class="block mb-2">Kategori:</label>
             <select name="kategori" id="kategori" class="w-full p-2 border rounded mb-2" required>
@@ -103,10 +117,14 @@ if (isset($_GET['delete'])) {
 </div>
 
 <script>
-    function editMenu(kode, nama, kategori, harga, gambar) {
+    function confirmDelete(menuName) {
+    return confirm("Apakah Anda yakin ingin menghapus menu '" + menuName + "'?");
+}
+    function editMenu(kode, nama, kategori, harga, gambar, deskripsi) {
         document.getElementById('edit_id').value = kode;
         document.getElementById('kode_menu').value = kode;
         document.getElementById('nama_menu').value = nama;
+        document.getElementById('deskripsi_menu').value = deskripsi;
         document.getElementById('kategori').value = kategori;
         document.getElementById('harga').value = harga;
         document.getElementById('gambar_lama').value = gambar;

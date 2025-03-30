@@ -1,5 +1,5 @@
 
-<footer class="bg-white rounded-lg shadow-sm m-4">
+<footer class="border-t-2 bg-white shadow-sm">
     <div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
         <span class="text-sm text-black sm:text-center">© 2025 <a href="" class="hover:underline">MieMe™</a>. All Rights Reserved.
     </span>

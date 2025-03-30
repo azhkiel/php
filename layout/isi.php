@@ -23,4 +23,11 @@
     </section>
 </div>
 
-<script src="script.js"></script>
+<script>
+    function openPopup() {
+        document.getElementById("menuPopup").classList.remove("hidden");
+    }
+    function closePopup() {
+        document.getElementById("menuPopup").classList.add("hidden");
+    }
+</script>
