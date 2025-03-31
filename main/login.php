@@ -1,48 +1,62 @@
 <?php 
-    // Menghubungkan ke file database.php untuk menyambungkan ke basis data
 include "../service/database.php";
-
-// Memulai sesi PHP
 session_start();
 
-// Inisialisasi variabel untuk menyimpan pesan login
-$login_mesegge = "";
-
-// Memeriksa apakah pengguna sudah login. Jika iya, langsung dialihkan ke dashboard.php
-if (isset($_SESSION["is_login"])){
-    header("Location: dashboard.php");
+if (isset($_SESSION["is_login"])) {
+    // Redirect berdasarkan role jika sudah login
+    switch ($_SESSION["role"]) {
+        case "owner":
+            header("Location: ../main/owner/dashOwner.php");
+            break;
+        case "admin":
+            header("Location: ../main/admin/dashAdmin.php");
+            break;
+        case "customer":
+            header("Location: ../main/customer/dashCustomer.php");
+            break;
+        case "staff":
+            header("Location: ../main/staff/dashStaff.php");
+            break;
+    }
+    exit();
 }
 
-// Memeriksa apakah form login telah disubmit
-if (isset($_POST['login'])){
-    // Mengambil data username dan password dari form
+if (isset($_POST['login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
-
-    // Mengenkripsi password menggunakan algoritma hash SHA-256
     $hash_password = hash("sha256", $password);
 
-    // Query untuk mencari user dengan username dan password yang cocok di tabel 'akunphp'
-    $sql = "SELECT * FROM users WHERE username = '$username' AND password = '$hash_password'";
-    $result = $db->query($sql); // Menjalankan query
+    $sql = "SELECT id, username, fullname, role FROM users WHERE username = '$username' AND password = '$hash_password'";
+    $result = $db->query($sql);
 
-    // Memeriksa apakah ada hasil yang ditemukan
     if ($result->num_rows > 0) {
-        // Mengambil data dari hasil query
         $data = $result->fetch_assoc();
-        // Menyimpan username dan status login dalam sesi
+        $_SESSION["user_id"] = $data["id"];
         $_SESSION["username"] = $data["username"];
+        $_SESSION["fullname"] = $data["fullname"];  // Simpan fullname
+        $_SESSION["role"] = $data["role"];
         $_SESSION["is_login"] = true;
-        // Menampilkan username (debugging purposes, lebih baik dihapus di produksi)
-        echo $data['username'];
-        // Mengarahkan pengguna ke dashboard.php
-        header("Location: dashboard.php");
+
+        // Redirect ke dashboard sesuai role
+        switch ($data["role"]) {
+            case "owner":
+                header("Location: ../main/owner/dashOwner.php");
+                break;
+            case "admin":
+                header("Location: ../main/admin/dashAdmin.php");
+                break;
+            case "customer":
+                header("Location: ../main/customer/dashCustomer.php");
+                break;
+            case "staff":
+                header("Location: ../main/staff/dashStaff.php");
+                break;
+        }
+        exit();
     } else {
-        // Menyimpan pesan error jika login gagal
-        $login_mesegge = "nama atau password salah!";
+        $login_mesegge = "Nama atau password salah!";
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
