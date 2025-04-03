@@ -1,3 +1,4 @@
+<!-- el -->
 <?php
 session_start();
 include "../../service/database.php";
