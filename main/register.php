@@ -6,7 +6,7 @@ include "../service/database.php";
 session_start();
 
 // Inisialisasi variabel untuk pesan registrasi
-$register_messege = "";
+$register_message = "";
 
 // Memeriksa apakah pengguna sudah login. Jika iya, langsung dialihkan ke dashboard.php
 if (isset($_SESSION["is_login"])){
@@ -17,27 +17,23 @@ if (isset($_SESSION["is_login"])){
 try {
     // Memeriksa apakah form register telah disubmit
     if (isset($_POST['register'])) {
-        // Mengambil data username dan password dari form
         $username = $_POST['username'];
         $fullname = $_POST['fullname'];
         $password = $_POST['password'];
 
-        // Mengenkripsi password menggunakan algoritma hash SHA-256
         $hash_password = hash("sha256", $password);
-
-        // Query untuk menyisipkan data user baru ke tabel 'akunphp'
-        $sql = "INSERT INTO `users`(`username`,`fullname`, `password`) VALUES ('$username','$fullname','$hash_password')";
+        $sql = "INSERT INTO `users`(`username`,`fullname`, `password`,`role`) VALUES ('$username','$fullname','$hash_password','customer')";
         
         // Menjalankan query dan memeriksa keberhasilannya
         if ($db->query($sql)) {
-            $register_messege = "Register success";
+            $register_message = "Register success";
         } else {
             echo "Register failed";
         }
     }
 } catch (mysqli_sql_exception) {
     // Menangani kesalahan, seperti ketika username sudah terdaftar
-    $register_messege = "username already registered!";
+    $register_message = "username already registered!";
 }
 ?>
 <!DOCTYPE html>
@@ -45,9 +41,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../src/sty.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="../layout/script.js"></script>
     <title>Form Register</title>
 </head>
 <body>
@@ -61,97 +55,158 @@ try {
             </div>
             <h1 class="text-2xl font-bold mb-4">Register</h1>
             
-            <form method="post" action="register.php" class="space-y-4" onsubmit="return validatePassword()">
+            <form method="post" action="register.php" class="space-y-4">
                 <div>
                     <label class="block font-semibold">Username:</label>
-                    <input type="text" placeholder="Username" name="username" class="w-full px-4 py-2 border rounded-md focus:border-blue-600">
+                    <input type="text" placeholder="Username" name="username" 
+                        class="w-full px-4 py-2 border rounded-md focus:border-blue-600"
+                        value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">
                 </div>
+                
                 <div>
                     <label class="block font-semibold">Fullname:</label>
-                    <input type="text" placeholder="Fullname" name="fullname" class="w-full px-4 py-2 border rounded-md focus:border-blue-600">
+                    <input type="text" placeholder="Fullname" name="fullname" 
+                        class="w-full px-4 py-2 border rounded-md focus:border-blue-600"
+                        value="<?= htmlspecialchars($_POST['fullname'] ?? '') ?>">
                 </div>
+                
                 <div>
                     <label class="block font-semibold">Password:</label>
                     <div class="relative">
-                        <input type="password" id="password" name="password" placeholder="Password" class="w-full px-4 py-2 border rounded-md focus:border-blue-600">
+                        <input type="password" id="password" name="password" placeholder="Password" 
+                            class="w-full px-4 py-2 border rounded-md focus:border-blue-600">
                         <span id="toggleIcon" onclick="togglePassword('password')" class="absolute right-3 top-2 cursor-pointer">
                             <img src="../assets/eye-close.svg" class="w-6 h-6" alt="eye-close">
                         </span>
                     </div>
                 </div>
+                
                 <div>
                     <label class="block font-semibold">Confirm Password:</label>
                     <div class="relative">
-                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" class="w-full px-4 py-2 border rounded-md focus:border-blue-600">
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" 
+                            class="w-full px-4 py-2 border rounded-md focus:border-blue-600">
                         <span id="toggleConfirmIcon" onclick="togglePassword('confirm_password')" class="absolute right-3 top-2 cursor-pointer">
                             <img src="../assets/eye-close.svg" class="w-6 h-6" alt="eye-close">
                         </span>
                     </div>
                 </div>
-                
                 <p class="text-sm">
                     Sudah memiliki akun? <a href="login.php" class="text-blue-600 hover:underline">Klik disini</a>
                 </p>
-                <button type="submit" name="register" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">Submit</button>
+                <button type="submit" name="register" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">
+                    Register
+                </button>
             </form>
         </div>
     </section>
+    <!-- Pop-up -->
+    <div id="popup" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white p-5 w-96 rounded-md shadow-lg text-center">
+            <h3 class="text-lg font-medium text-gray-900" id="popup-message"></h3>
+            <button id="close-popup" 
+                class="mt-4 w-full px-4 py-2 bg-blue-500 text-white font-medium rounded-md shadow-sm hover:bg-blue-700">
+                Close
+            </button>
+        </div>
+    </div>
 
 
 <script>
-    // Function to show the pop-up
+    // Fungsi toggle yang konsisten
+    function togglePassword(inputId) {
+        var input = document.getElementById(inputId);
+        var icon = document.getElementById(inputId === 'password' ? 'toggleIcon' : 'toggleConfirmIcon');
+        
+        if (input.type === "password") {
+            input.type = "text";
+            icon.innerHTML = `<img src="../assets/eye-open.svg" class="w-6 h-6" alt="eye-open">`;
+        } else {
+            input.type = "password";
+            icon.innerHTML = `<img src="../assets/eye-close.svg" class="w-6 h-6" alt="eye-close">`;
+        }
+    }
+    // Validasi password
+    function validatePassword() {
+        var password = document.getElementById("password").value;
+        var confirmPassword = document.getElementById("confirm_password").value;
+        
+        if (password !== confirmPassword) {
+            showPopup("Password dan Confirm Password tidak sesuai!");
+            return false;
+        }
+        return true;
+    }
+
+    // Fungsi popup (pastikan ini ada)
     function showPopup(message) {
         document.getElementById('popup-message').textContent = message;
         document.getElementById('popup').classList.remove('hidden');
     }
 
-    // Function to hide the pop-up
     function hidePopup() {
         document.getElementById('popup').classList.add('hidden');
     }
 
-    // Event listener for the close button
+    // Event listener
     document.getElementById('close-popup').addEventListener('click', hidePopup);
 
-    // Check if there's a message to display
-    <?php if (!empty($register_messege)): ?>
+    // Tampilkan popup jika ada pesan dari PHP
+    <?php if (!empty($register_message)): ?>
     document.addEventListener('DOMContentLoaded', function() {
-        showPopup(<?= json_encode($register_messege) ?>);
+        showPopup(<?= json_encode($register_message) ?>);
     });
     <?php endif; ?>
 </script>
 <script>
-        function togglePassword(inputId) {
-            var input = document.getElementById(inputId);
-            input.type = input.type === "password" ? "text" : "password";
-        }
+// Validasi sebelum submit
+document.querySelector('form').addEventListener('submit', function(e) {
+    const username = document.querySelector('[name="username"]').value.trim();
+    const fullname = document.querySelector('[name="fullname"]').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const confirmPassword = document.getElementById('confirm_password').value.trim();
+    
+    const errors = [];
+    
+    if (!username) errors.push("Username harus diisi ");
+    if (!fullname) errors.push("Nama lengkap harus diisi");
+    if (!password) errors.push("Password harus diisi");
+    if (!confirmPassword) errors.push("Konfirmasi password harus diisi");
+    
+    if (errors.length > 0) {
+        e.preventDefault(); // Menghentikan form submit
+        showPopup(errors.join("<br>"));
+        return false;
+    }
+    
+    // Validasi password match
+    if (password !== confirmPassword) {
+        e.preventDefault();
+        showPopup("Password dan konfirmasi password tidak sama");
+        return false;
+    }
+    
+    return true;
+});
 
-        function validatePassword() {
-            var password = document.getElementById("password").value;
-            var confirmPassword = document.getElementById("confirm_password").value;
-            
-            if (password !== confirmPassword) {
-                showPopup("password dan confirm password tidak sesuai!")
-                return false;
-            }
-            return true;
+// Fungsi untuk menandai field yang error
+function markFieldErrors() {
+    const fields = [
+        { name: 'username', label: 'Username' },
+        { name: 'fullname', label: 'Nama lengkap' },
+        { name: 'password', label: 'Password' },
+        { name: 'confirm_password', label: 'Konfirmasi password' }
+    ];
+    
+    fields.forEach(field => {
+        const input = document.querySelector(`[name="${field.name}"]`);
+        if (input && input.value.trim() === '') {
+            input.classList.add('border-red-500');
+            input.insertAdjacentHTML('afterend', 
+                `<p class="text-red-500 text-sm mt-1">${field.label} harus diisi</p>`);
         }
-        function togglePassword() {
-            var passwordField = document.getElementById("password");
-            var toggleIcon = document.getElementById("toggleIcon");
-            
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-                toggleIcon.innerHTML = `
-                    <img src="../assets/eye-open.svg" class="w-6 h-6" alt="eye-open">
-                `;
-            } else {
-                passwordField.type = "password";
-                toggleIcon.innerHTML = `
-                    <img src="../assets/eye-close.svg" class="w-6 h-6" alt="eye-close">
-                `;
-            }
-        }
+    });
+}
 </script>
 <?php include "../layout/footer.php" ?>
 </body>

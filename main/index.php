@@ -1,16 +1,28 @@
 <?php
-// Menghubungkan ke file database.php untuk menyambungkan ke basis data
 include "../service/database.php";
-
-// Memulai sesi PHP
 session_start();
-// Inisialisasi variabel untuk menyimpan pesan login
-$login_mesegge = "";
+$login_message = "";
 
 // Memeriksa apakah pengguna sudah login. Jika iya, langsung dialihkan ke dashboard.php
-if (isset($_SESSION["is_login"])){
-    header("Location: dashboard.php");
+if (isset($_SESSION["is_login"])) {
+    // Redirect berdasarkan role jika sudah login
+    switch ($_SESSION["role"]) {
+        case "owner":
+            header("Location: ../main/owner/dashOwner.php");
+            break;
+        case "admin":
+            header("Location: ../main/admin/dashAdmin.php");
+            break;
+        case "customer":
+            header("Location: ../main/customer/dashCustomer.php");
+            break;
+        case "staff":
+            header("Location: ../main/staff/dashStaff.php");
+            break;
+    }
+    exit();
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

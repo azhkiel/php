@@ -33,7 +33,7 @@ if (isset($_POST['login'])) {
         $data = $result->fetch_assoc();
         $_SESSION["user_id"] = $data["id"];
         $_SESSION["username"] = $data["username"];
-        $_SESSION["fullname"] = $data["fullname"];  // Simpan fullname
+        $_SESSION["fullname"] = $data["fullname"];
         $_SESSION["role"] = $data["role"];
         $_SESSION["is_login"] = true;
 
@@ -54,7 +54,7 @@ if (isset($_POST['login'])) {
         }
         exit();
     } else {
-        $login_mesegge = "Nama atau password salah!";
+        $login_message = "Nama atau password salah!";
     }
 }
 ?>
@@ -99,14 +99,11 @@ if (isset($_POST['login'])) {
                         </span>
                     </div>
                 </div>
-
                 <a href="#" class="text-sm text-blue-600 hover:underline block text-right">Lupa Kata Sandi?</a>
-
                 <button type="submit" name="login" 
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">
                     Submit
                 </button>
-
                 <p class="text-gray-600 text-sm text-center mt-2">
                     Belum punya akun? 
                     <a href="register.php" class="text-blue-600 hover:underline">Daftar di sini</a>
@@ -127,12 +124,11 @@ if (isset($_POST['login'])) {
     </div>
 
 <script>
-    // Function to show the pop-up
+// Function to show the pop-up
 function showPopup(message) {
     document.getElementById('popup-message').textContent = message;
     document.getElementById('popup').classList.remove('hidden');
 }
-//hai
 // Function to hide the pop-up
 function hidePopup() {
     document.getElementById('popup').classList.add('hidden');
@@ -158,9 +154,9 @@ function togglePassword() {
 }
 
 // Check if there's a message to display
-<?php if (!empty($login_mesegge)): ?>
+<?php if (!empty($login_message)): ?>
 document.addEventListener('DOMContentLoaded', function() {
-    showPopup(<?= json_encode($login_mesegge) ?>);
+    showPopup(<?= json_encode($login_message) ?>);
 });
 <?php endif; ?>
 </script>
