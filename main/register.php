@@ -76,7 +76,7 @@ try {
                         <input type="password" id="password" name="password" placeholder="Password" 
                             class="w-full px-4 py-2 border rounded-md focus:border-blue-600">
                         <span id="toggleIcon" onclick="togglePassword('password')" class="absolute right-3 top-2 cursor-pointer">
-                            <img src="../assets/eye-close.svg" class="w-6 h-6" alt="eye-close">
+                            <img src="../assets/svg/eye-close.svg" class="w-6 h-6" alt="eye-close">
                         </span>
                     </div>
                 </div>
@@ -87,7 +87,7 @@ try {
                         <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" 
                             class="w-full px-4 py-2 border rounded-md focus:border-blue-600">
                         <span id="toggleConfirmIcon" onclick="togglePassword('confirm_password')" class="absolute right-3 top-2 cursor-pointer">
-                            <img src="../assets/eye-close.svg" class="w-6 h-6" alt="eye-close">
+                            <img src="../assets/svg/eye-close.svg" class="w-6 h-6" alt="eye-close">
                         </span>
                     </div>
                 </div>
@@ -120,10 +120,10 @@ try {
         
         if (input.type === "password") {
             input.type = "text";
-            icon.innerHTML = `<img src="../assets/eye-open.svg" class="w-6 h-6" alt="eye-open">`;
+            icon.innerHTML = `<img src="../assets/svg/eye-open.svg" class="w-6 h-6" alt="eye-open">`;
         } else {
             input.type = "password";
-            icon.innerHTML = `<img src="../assets/eye-close.svg" class="w-6 h-6" alt="eye-close">`;
+            icon.innerHTML = `<img src="../assets/svg/eye-close.svg" class="w-6 h-6" alt="eye-close">`;
         }
     }
     // Validasi password

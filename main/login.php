@@ -63,7 +63,6 @@ if (isset($_POST['login'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../src/sty.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Form Login</title>
 </head>
@@ -143,12 +142,12 @@ function togglePassword() {
     if (passwordField.type === "password") {
         passwordField.type = "text";
         toggleIcon.innerHTML = `
-            <img src="../assets/eye-open.svg" class="w-6 h-6" alt="eye-open">
+            <img src="../assets/svg/eye-open.svg" class="w-6 h-6" alt="eye-open">
         `;
     } else {
         passwordField.type = "password";
         toggleIcon.innerHTML = `
-            <img src="../assets/eye-close.svg" class="w-6 h-6" alt="eye-close">
+            <img src="../assets/svg/eye-close.svg" class="w-6 h-6" alt="eye-close">
         `;
     }
 }

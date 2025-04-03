@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Proses Upload Gambar
     if (!empty($_FILES['gambar']['name'])) {
         $gambar_name = basename($_FILES['gambar']['name']);
-        $gambar_target = "../../assets/" . $gambar_name;
+        $gambar_target = "../../assets/img/menu/" . $gambar_name;
         move_uploaded_file($_FILES['gambar']['tmp_name'], $gambar_target);
     } else {
         $gambar_name = $gambar_lama; // Jika tidak upload gambar, pakai yang lama
@@ -55,7 +55,7 @@ if (isset($_GET['delete'])) {
         <?php
         $result = $db->query("SELECT * FROM menu");
         while ($row = $result->fetch_assoc()) {
-            $gambar_path = "../../assets/" . $row["gambar"];
+            $gambar_path = "../../assets/img/menu/" . $row["gambar"];
             ?>
         <li class="border rounded-lg p-4 shadow hover:shadow-lg transition">
             <img src="<?php echo $gambar_path; ?>" alt="<?php echo $row["nama_menu"]; ?>" class="w-full h-32 object-cover rounded mb-2">
