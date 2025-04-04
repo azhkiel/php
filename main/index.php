@@ -102,7 +102,7 @@ if (isset($_SESSION["is_login"])) {
     <main class="pt-[80px]">
         <div id="content">
             <!-- Hero Section -->
-    <section class="relative w-full h-screen bg-cover bg-center flex items-center px-12 overflow-hidden" style="background-image: url('../assets/bg.png');">
+    <section class="relative w-full h-screen bg-cover bg-center flex items-center px-12 overflow-hidden" style="background-image: url('../assets/img/mieme/bg.png');">
         <!-- Overlay Hitam Transparan -->
         <div class="absolute inset-0 bg-black opacity-50"></div>
 
