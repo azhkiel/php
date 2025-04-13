@@ -150,7 +150,7 @@ if (isset($_SESSION["is_login"])) {
             });
         });
     </script>
-        <section id="promo">
+        <section id="menu">
             <?php include '../layout/menuData.php'; ?>
         </section>
         <section id="about">

@@ -3,7 +3,7 @@
         <div class="flex flex-wrap items-center justify-between max-w-screen-xl mx-auto p-4">
             <!-- Logo with Animation -->
             <a href="index.php" class="flex items-center space-x-3 rtl:space-x-reverse group">
-                <img src="../assets/Logo Mentaly.png" class="h-12 transition-transform duration-300 group-hover:rotate-12" alt="MieMe Logo" />
+                <img src="../assets/img/mieme/Logo Mentaly.png" class="h-12 transition-transform duration-300 group-hover:rotate-12" alt="MieMe Logo" />
                 <span class="self-center text-2xl font-bold whitespace-nowrap bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
                     MieMe
                 </span>
@@ -46,30 +46,25 @@
                     </li>
                     <li>
                         <a href="menu.php"
-                           class="nav-link block py-2 px-3 text-gray-700 hover:text-blue-600 md:p-0 relative group">
-                           <span>Menu</span>
-                           <span class="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+                            onclick="loadSection('menu'); return false;"
+                            class="nav-link block py-2 px-3 text-gray-700 hover:text-blue-600 md:p-0 relative group">
+                            <span>Menu</span>
+                            <span class="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
                         </a>
                     </li>
                     <li>
-                        <a href="promo.php"
-                           class="nav-link block py-2 px-3 text-gray-700 hover:text-blue-600 md:p-0 relative group">
-                           <span>Promo</span>
-                           <span class="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="about.php"
-                           class="nav-link block py-2 px-3 text-gray-700 hover:text-blue-600 md:p-0 relative group">
-                           <span>Tentang Kami</span>
-                           <span class="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+                        <a href="#"
+                            onclick="loadSection('about'); return false;"
+                            class="nav-link block py-2 px-3 text-gray-700 hover:text-blue-600 md:p-0 relative group">
+                            <span>Tentang Kami</span>
+                            <span class="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
                         </a>
                     </li>
                     <li>
                         <a href="contact.php"
-                           class="nav-link block py-2 px-3 text-gray-700 hover:text-blue-600 md:p-0 relative group">
-                           <span>Kontak</span>
-                           <span class="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
+                            class="nav-link block py-2 px-3 text-gray-700 hover:text-blue-600 md:p-0 relative group">
+                            <span>Kontak</span>
+                            <span class="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
                         </a>
                     </li>
                 </ul>

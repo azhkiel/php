@@ -102,7 +102,7 @@ if (isset($_POST['login'])) {
             <!-- Logo Section -->
             <div class="flex flex-col items-center mb-8 transform transition-all hover:scale-105">
                 <div class="flex items-center justify-center mb-4">
-                    <img class="w-16 h-16 mr-3 animate-spin-slow" src="../assets/Logo Mentaly.png" alt="Icon">
+                    <img class="w-16 h-16 mr-3 animate-spin-slow" src="../assets/img/mieme/Logo Mentaly.png" alt="Icon">
                     <span class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">MieMe</span>
                 </div>
                 <h1 class="text-2xl font-bold text-gray-800">Welcome Back!</h1>
@@ -115,7 +115,7 @@ if (isset($_POST['login'])) {
                 <div class="space-y-1">
                     <label class="block text-sm font-medium text-gray-700">Username</label>
                     <div class="relative">
-                        <input type="text" id="username" name="username" placeholder="your_username" 
+                        <input type="text" id="username" name="username" placeholder="Username" 
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                             value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -130,7 +130,7 @@ if (isset($_POST['login'])) {
                 <div class="space-y-1">
                     <label class="block text-sm font-medium text-gray-700">Password</label>
                     <div class="relative">
-                        <input type="password" id="password" name="password" placeholder="••••••••" 
+                        <input type="password" id="password" name="password" placeholder="Password" 
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                         <span id="toggleIcon" onclick="togglePassword()" class="absolute right-3 top-3.5 cursor-pointer text-gray-400 hover:text-gray-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

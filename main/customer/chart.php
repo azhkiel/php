@@ -150,7 +150,7 @@ while ($row = $result->fetch_assoc()) {
                         <div class="space-y-4">
                             <?php foreach ($items as $item): ?>
                                 <div class="flex items-center border-b border-gray-100 pb-4 group hover:bg-gray-50 transition-colors duration-200 p-3 rounded-lg">
-                                    <img src="../../assets/<?= $item['gambar'] ?>" 
+                                    <img src="../../assets/img/menu/<?= $item['gambar'] ?>" 
                                          class="w-20 h-20 rounded-lg object-cover mr-4 shadow-sm transition-transform duration-300 group-hover:scale-105">
                                     <div class="flex-1">
                                         <p class="font-semibold text-gray-800"><?= $item['nama_menu'] ?></p>

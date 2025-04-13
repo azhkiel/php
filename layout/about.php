@@ -67,7 +67,7 @@
         <!-- Image Column -->
         <div class="relative z-10 opacity-0 animate-fade-in-left animate-on-scroll">
             <div class="relative overflow-hidden rounded-2xl shadow-2xl">
-                <img src="../assets/Mie.jpg" alt="Tentang Mieme" 
+                <img src="../assets/img/menu/Mie.jpg" alt="Tentang Mieme" 
                      class="w-full h-auto object-cover transform transition-all duration-700 hover:scale-110">
                 <div class="absolute inset-0 bg-gradient-to-t from-blue-800/30 to-transparent"></div>
                 <!-- Decorative Badge -->
