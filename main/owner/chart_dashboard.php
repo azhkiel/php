@@ -1,5 +1,5 @@
 <?php
-include '../../service/database.php';
+include '../../service/database.php';// hai
 session_start();
 
 // Check if user is owner/admin
