@@ -61,7 +61,8 @@
                         </a>
                     </li>
                     <li>
-                        <a href="contact.php"
+                        <a href="#"
+                            onclick="loadSection('section'); return false;"
                             class="nav-link block py-2 px-3 text-gray-700 hover:text-blue-600 md:p-0 relative group">
                             <span>Kontak</span>
                             <span class="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>

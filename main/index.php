@@ -156,7 +156,12 @@ if (isset($_SESSION["is_login"])) {
         <section id="about">
             <?php include '../layout/about.php'; ?>
         </section>
-        <?php include "../layout/section.php" ?>
+        <section id="review">
+            <?php include '../layout/review.php'; ?>
+        </section>
+        <section id="section">
+            <?php include '../layout/section.php'; ?>
+        </section>
     </div>
 </main>
     <?php include "../layout/footer.php" ?>

@@ -194,7 +194,7 @@ if (isset($_POST['logout'])){
                                                         -
                                                     </button>
                                                     <input type="number" name="quantity" value="1" min="1" 
-                                                           class="quantity-input w-10 text-center border-none bg-transparent">
+                                                        class="quantity-input w-10 text-center border-none bg-transparent">
                                                     <button type="button" class="increase-btn px-2 py-1 text-gray-600 hover:text-blue-600 transition-colors">
                                                         +
                                                     </button>

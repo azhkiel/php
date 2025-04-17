@@ -1,39 +1,127 @@
 <?php
 include "../service/database.php";
-session_start();
+
+// Ensure session is started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 $register_message = "";
 
-if (isset($_SESSION["is_login"])){
+if (isset($_SESSION["is_login"])) {
     header("Location: dashboard.php");
+    exit();
 }
 
 try {
     if (isset($_POST['register'])) {
-        $username = $_POST['username'];
-        $fullname = $_POST['fullname'];
+        $username = trim($_POST['username']);
+        $fullname = trim($_POST['fullname']);
+        $phone = trim($_POST['phone']);
         $password = $_POST['password'];
+        $confirm_password = $_POST['confirm_password'];
 
-        $hash_password = hash("sha256", $password);
-        $sql = "INSERT INTO `users`(`username`,`fullname`, `password`,`role`) VALUES ('$username','$fullname','$hash_password','customer')";
+        // Validate inputs
+        $errors = [];
         
-        if ($db->query($sql)) {
-            $register_message = "🎉 Registration successful! Please login.";
+        if (empty($username)) {
+            $errors[] = "Username is required";
+        }
+        
+        if (empty($fullname)) {
+            $errors[] = "Full name is required";
+        }
+        
+        if (empty($phone)) {
+            $errors[] = "Phone number is required";
+        }
+        
+        // Format phone number consistently
+        if (substr($phone, 0, 2) === "62") {
+            // Keep as is
+        } elseif (substr($phone, 0, 1) === "0") {
+            // Convert 08xxx to 628xxx
+            $phone = "62" . substr($phone, 1);
+        } elseif (substr($phone, 0, 1) === "8") {
+            // Convert 8xxx to 628xxx
+            $phone = "62" . $phone;
         } else {
-            echo "Register failed";
+            $errors[] = "Invalid phone number format. Use format: 08xxxxxxxxxx or 628xxxxxxxxxx";
+        }
+        
+        // Phone number validation
+        if (!preg_match('/^62\d{9,13}$/', $phone)) {
+            $errors[] = "Phone number must be in format 628xxxxxxxxxx with 10-14 digits total";
+        }
+        
+        // Password validation
+        if (empty($password)) {
+            $errors[] = "Password is required";
+        } elseif (strlen($password) < 6) {
+            $errors[] = "Password must be at least 6 characters";
+        }
+        
+        if ($password !== $confirm_password) {
+            $errors[] = "Passwords don't match";
+        }
+        
+        // If there are validation errors
+        if (!empty($errors)) {
+            $register_message = "⚠️ " . implode("<br>⚠️ ", $errors);
+        } else {
+            // Hash password
+            $hash_password = hash("sha256", $password);
+
+            // First, check if username already exists
+            $check_stmt = $db->prepare("SELECT id FROM users WHERE username = ?");
+            $check_stmt->bind_param('s', $username);
+            $check_stmt->execute();
+            $check_result = $check_stmt->get_result();
+            
+            if ($check_result->num_rows > 0) {
+                $register_message = "⚠️ Username already exists!";
+            } else {
+                // Insert the new user
+                $stmt = $db->prepare("INSERT INTO `users`(`username`, `fullname`, `phone`, `password`, `role`) 
+                    VALUES (?, ?, ?, ?, 'customer')");
+                $stmt->bind_param('ssss', $username, $fullname, $phone, $hash_password);
+                
+                if ($stmt->execute()) {
+                    // Get the user ID of the newly created user
+                    $user_id = $db->insert_id;
+
+                    // Store user_id in session for OTP verification
+                    $_SESSION['temp_user_id'] = $user_id;
+                    $_SESSION['temp_phone'] = $phone;
+                    unset($_SESSION['otp_sent']); // Make sure we generate a new OTP
+
+                    // Redirect to OTP verification page
+                    header("Location: verify_otp.php");
+                    exit();
+                } else {
+                    $register_message = "⚠️ Registration failed: " . $db->error;
+                }
+            }
         }
     }
-} catch (mysqli_sql_exception) {
-    $register_message = "⚠️ Username already exists!";
+} catch (mysqli_sql_exception $e) {
+    // Check if error is duplicate entry for username
+    if ($db->errno == 1062 && strpos($e->getMessage(), 'username')) {
+        $register_message = "⚠️ Username already exists!";
+    } else {
+        $register_message = "⚠️ Registration failed: " . $e->getMessage();
+    }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <title>Register | MieMe</title>
     <script>
         tailwind.config = {
@@ -45,12 +133,20 @@ try {
                     },
                     keyframes: {
                         float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' },
+                            '0%, 100%': {
+                                transform: 'translateY(0)'
+                            },
+                            '50%': {
+                                transform: 'translateY(-10px)'
+                            },
                         },
                         fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
+                            '0%': {
+                                opacity: '0'
+                            },
+                            '100%': {
+                                opacity: '1'
+                            },
                         }
                     }
                 }
@@ -58,14 +154,15 @@ try {
         }
     </script>
 </head>
+
 <body class="bg-gradient-to-br from-blue-50 to-purple-50">
     <?php include "../layout/header.php" ?>
-    
+
     <section class="relative min-h-screen flex items-center justify-center p-4 pt-[90px]">
         <img src="../assets/img/mieme/bg.png" class="absolute w-full h-full object-cover ">
         <!-- Animated floating noodles -->
-        <?php include '../layout/decoration.php';?>
-        
+        <?php include '../layout/decoration.php'; ?>
+
         <!-- Main Card -->
         <div class="relative bg-white p-8 rounded-2xl shadow-xl max-w-md w-full animate__animated animate__fadeInUp animate__faster backdrop-blur-sm bg-white/90">
             <!-- Logo Section -->
@@ -77,14 +174,21 @@ try {
                 <h1 class="text-2xl font-bold text-gray-800">Create Your Account</h1>
                 <p class="text-gray-500">Join our easy order Mieme</p>
             </div>
-            
+
+            <!-- Registration Messages -->
+            <?php if (!empty($register_message)): ?>
+            <div class="mb-4 p-3 rounded <?= strpos($register_message, '⚠️') !== false ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700' ?>">
+                <?= $register_message ?>
+            </div>
+            <?php endif; ?>
+
             <!-- Register Form -->
             <form method="post" action="register.php" class="space-y-5">
                 <!-- Username Field -->
                 <div class="space-y-1">
                     <label class="block text-sm font-medium text-gray-700">Username</label>
                     <div class="relative">
-                        <input type="text" placeholder="Username" name="username" 
+                        <input type="text" placeholder="Username" name="username"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                             value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -94,20 +198,36 @@ try {
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Fullname Field -->
                 <div class="space-y-1">
                     <label class="block text-sm font-medium text-gray-700">Full Name</label>
-                    <input type="text" placeholder="Fullname" name="fullname" 
+                    <input type="text" placeholder="Full Name" name="fullname"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                         value="<?= htmlspecialchars($_POST['fullname'] ?? '') ?>">
                 </div>
-                
+
+                <!-- Phone Field -->
+                <div class="space-y-1">
+                    <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+                    <div class="relative">
+                        <input type="text" placeholder="628xxxxxxxxxx" name="phone"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                            value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500">Format: 628xxxxxxxxxx or 08xxxxxxxxxx (no spaces or special characters)</p>
+                </div>
+
                 <!-- Password Field -->
                 <div class="space-y-1">
                     <label class="block text-sm font-medium text-gray-700">Password</label>
                     <div class="relative">
-                        <input type="password" id="password" name="password" placeholder="Password" 
+                        <input type="password" id="password" name="password" placeholder="Password"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                         <span id="toggleIcon" onclick="togglePassword('password')" class="absolute right-3 top-3.5 cursor-pointer text-gray-400 hover:text-gray-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -116,13 +236,14 @@ try {
                             </svg>
                         </span>
                     </div>
+                    <p class="text-xs text-gray-500">Minimum 6 characters</p>
                 </div>
-                
+
                 <!-- Confirm Password Field -->
                 <div class="space-y-1">
                     <label class="block text-sm font-medium text-gray-700">Confirm Password</label>
                     <div class="relative">
-                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" 
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                         <span id="toggleConfirmIcon" onclick="togglePassword('confirm_password')" class="absolute right-3 top-3.5 cursor-pointer text-gray-400 hover:text-gray-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -132,17 +253,17 @@ try {
                         </span>
                     </div>
                 </div>
-                
+
                 <!-- Login Link -->
                 <p class="text-sm text-center text-gray-500">
-                    Already have an account? 
+                    Already have an account?
                     <a href="login.php" class="font-medium text-blue-600 hover:text-blue-500 hover:underline transition-colors">
                         Login here
                     </a>
                 </p>
-                
+
                 <!-- Submit Button -->
-                <button type="submit" name="register" 
+                <button type="submit" name="register"
                     class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5">
                     Register Now
                 </button>
@@ -150,30 +271,14 @@ try {
         </div>
     </section>
 
-    <!-- Popup Notification -->
-    <div id="popup" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 transition-opacity duration-300">
-        <div class="bg-white p-6 max-w-sm w-full rounded-xl shadow-2xl transform transition-all duration-300 animate__animated animate__zoomIn">
-            <div class="text-center">
-                <div id="popup-icon" class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
-                    <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2" id="popup-message"></h3>
-                <button id="close-popup" 
-                    class="mt-4 w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
-                    Got it!
-                </button>
-            </div>
-        </div>
-    </div>
+    <?php include "../layout/footer.php" ?>
 
     <script>
         // Toggle password visibility
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
             const icon = document.getElementById(inputId === 'password' ? 'toggleIcon' : 'toggleConfirmIcon');
-            
+
             if (input.type === "password") {
                 input.type = "text";
                 icon.innerHTML = `
@@ -189,77 +294,6 @@ try {
                     </svg>`;
             }
         }
-
-        // Show popup with animation
-        function showPopup(message) {
-            const popup = document.getElementById('popup');
-            const popupMessage = document.getElementById('popup-message');
-            const popupIcon = document.getElementById('popup-icon');
-            
-            popupMessage.textContent = message;
-            
-            // Change icon based on message
-            if (message.includes("success")) {
-                popupIcon.innerHTML = `
-                    <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>`;
-                popupIcon.classList.remove('bg-blue-100');
-                popupIcon.classList.add('bg-green-100');
-            } else {
-                popupIcon.innerHTML = `
-                    <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>`;
-                popupIcon.classList.remove('bg-blue-100');
-                popupIcon.classList.add('bg-red-100');
-            }
-            
-            popup.classList.remove('hidden');
-        }
-
-        // Hide popup
-        function hidePopup() {
-            document.getElementById('popup').classList.add('hidden');
-        }
-
-        // Close popup when clicking the button
-        document.getElementById('close-popup').addEventListener('click', hidePopup);
-
-        // Form validation
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const username = document.querySelector('[name="username"]').value.trim();
-            const fullname = document.querySelector('[name="fullname"]').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const confirmPassword = document.getElementById('confirm_password').value.trim();
-            
-            const errors = [];
-            
-            if (!username) errors.push("Username is required");
-            if (!fullname) errors.push("Full name is required");
-            if (!password) errors.push("Password is required");
-            if (!confirmPassword) errors.push("Please confirm your password");
-            
-            if (password !== confirmPassword) {
-                errors.push("Passwords don't match");
-            }
-            
-            if (errors.length > 0) {
-                e.preventDefault();
-                showPopup(errors.join("\n"));
-                return false;
-            }
-            
-            return true;
-        });
-
-        // Show popup if there's a message from PHP
-        <?php if (!empty($register_message)): ?>
-        document.addEventListener('DOMContentLoaded', function() {
-            showPopup(<?= json_encode($register_message) ?>);
-        });
-        <?php endif; ?>
     </script>
-    <?php include "../layout/footer.php" ?>
 </body>
 </html>
