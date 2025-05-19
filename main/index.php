@@ -22,7 +22,6 @@ if (isset($_SESSION["is_login"])) {
     }
     exit();
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
